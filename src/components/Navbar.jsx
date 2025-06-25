@@ -1,9 +1,12 @@
 import 'bootstrap/dist/css/bootstrap.min.css'
 import React from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 
-const Navbar = ({ onChangeView }) => {
-  const token = false // cambiar a true para simular login
-  const total = 25000
+const Navbar = ({ cart, token }) => {
+  const navigate = useNavigate()
+
+  // Suma total del carrito, o 0 si no hay
+  const total = cart.reduce((acc, item) => acc + item.price * item.cantidad, 0)
 
   const formatearTotal = (valor) => {
     return valor.toLocaleString('es-CL') // Ej: 25.000
@@ -12,14 +15,16 @@ const Navbar = ({ onChangeView }) => {
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-dark px-4">
       <div className="container-fluid">
-        <a className="navbar-brand" href="#">🍕 PizzaApp</a>
+        {/* Link a home */}
+        <Link className="navbar-brand" to="/">🍕 PizzaApp</Link>
 
         <div className="ms-auto d-flex gap-2">
-          {/* SIEMPRE visibles */}
-          <button className="btn btn-outline-light" onClick={() => onChangeView('home')}>🏠 Home</button>
+          {/* Navegación con Links */}
+          <Link className="btn btn-outline-light" to="/">🏠 Home</Link>
+
           <button 
             className="btn btn-warning" 
-            onClick={() => onChangeView('cart')}
+            onClick={() => navigate('/cart')}
           >
             🛒 Total: ${formatearTotal(total)}
           </button>
@@ -27,13 +32,15 @@ const Navbar = ({ onChangeView }) => {
           {/* Condicional según token */}
           {token ? (
             <>
-              <button className="btn btn-outline-light">🔓 Profile</button>
-              <button className="btn btn-outline-light">🔒 Logout</button>
+              <Link className="btn btn-outline-light" to="/profile">🔓 Profile</Link>
+              <button className="btn btn-outline-light" onClick={() => alert('Cerrar sesión')}>
+                🔒 Logout
+              </button>
             </>
           ) : (
             <>
-              <button className="btn btn-outline-light" onClick={() => onChangeView('login')}>🔐 Login</button>
-              <button className="btn btn-outline-light" onClick={() => onChangeView('register')}>🔐 Register</button>
+              <Link className="btn btn-outline-light" to="/login">🔐 Login</Link>
+              <Link className="btn btn-outline-light" to="/register">🔐 Register</Link>
             </>
           )}
         </div>
@@ -43,3 +50,4 @@ const Navbar = ({ onChangeView }) => {
 }
 
 export default Navbar
+
