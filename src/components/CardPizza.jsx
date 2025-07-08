@@ -1,4 +1,14 @@
-function CardPizza({ name, price, ingredients, img, onAgregar }) {
+import React from 'react';
+import { useCart } from '../context/CartContext'; // ✅ Importar el contexto
+
+function CardPizza({ id, name, price, ingredients, img }) {
+  const { addToCart } = useCart(); // ✅ Obtener función para agregar al carrito
+
+  const handleAgregar = () => {
+    const producto = { id, name, price, img };
+    addToCart(producto);
+  };
+
   return (
     <div className="card" style={{ width: '18rem' }}>
       <img src={img} className="card-img-top" alt={name} />
@@ -15,12 +25,13 @@ function CardPizza({ name, price, ingredients, img, onAgregar }) {
           ${price.toLocaleString('es-CL')}
         </p>
 
-        <button className="btn btn-primary w-100" onClick={onAgregar}>
+        <button className="btn btn-primary w-100" onClick={handleAgregar}>
           Pedir ahora
         </button>
       </div>
     </div>
-  )
+  );
 }
 
-export default CardPizza
+export default CardPizza;
+

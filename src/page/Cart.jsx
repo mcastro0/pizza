@@ -1,25 +1,11 @@
 import React from 'react';
+import { useCart } from '../context/CartContext'; // ✅ Importar contexto
 
-const Cart = ({ cart, setCart }) => {
-
-  const incrementarCantidad = (id) => {
-    setCart(cart.map(pizza =>
-      pizza.id === id ? { ...pizza, cantidad: pizza.cantidad + 1 } : pizza
-    ));
-  };
-
-  const disminuirCantidad = (id) => {
-    setCart(cart =>
-      cart
-        .map(pizza =>
-          pizza.id === id ? { ...pizza, cantidad: pizza.cantidad - 1 } : pizza
-        )
-        .filter(pizza => pizza.cantidad > 0)
-    );
-  };
+const Cart = () => {
+  const { cart, addToCart, removeFromCart, clearCart } = useCart(); // ✅ Obtener funciones del contexto
 
   const calcularTotal = () => {
-    return cart.reduce((acc, pizza) => acc + pizza.price * pizza.cantidad, 0);
+    return cart.reduce((acc, pizza) => acc + pizza.price * pizza.quantity, 0);
   };
 
   return (
@@ -33,7 +19,11 @@ const Cart = ({ cart, setCart }) => {
           {cart.map(pizza => (
             <li key={pizza.id} className="list-group-item d-flex justify-content-between align-items-center">
               <div className="d-flex align-items-center gap-3">
-                <img src={pizza.img} alt={pizza.name} style={{ width: '60px', height: '60px', objectFit: 'cover' }} />
+                <img
+                  src={pizza.img}
+                  alt={pizza.name}
+                  style={{ width: '60px', height: '60px', objectFit: 'cover' }}
+                />
                 <div>
                   <h6 className="my-0">{pizza.name}</h6>
                   <small className="text-muted">
@@ -43,9 +33,19 @@ const Cart = ({ cart, setCart }) => {
               </div>
 
               <div className="d-flex align-items-center gap-2">
-                <button className="btn btn-outline-danger btn-sm" onClick={() => disminuirCantidad(pizza.id)}>-</button>
-                <span>{pizza.cantidad}</span>
-                <button className="btn btn-outline-success btn-sm" onClick={() => incrementarCantidad(pizza.id)}>+</button>
+                <button
+                  className="btn btn-outline-danger btn-sm"
+                  onClick={() => removeFromCart(pizza.id)}
+                >
+                  -
+                </button>
+                <span>{pizza.quantity}</span>
+                <button
+                  className="btn btn-outline-success btn-sm"
+                  onClick={() => addToCart(pizza)}
+                >
+                  +
+                </button>
               </div>
             </li>
           ))}
@@ -53,7 +53,15 @@ const Cart = ({ cart, setCart }) => {
       )}
 
       <h5>Total: ${calcularTotal().toLocaleString('es-CL')}</h5>
-      <button className="btn btn-success mt-3">Pagar</button>
+
+      {cart.length > 0 && (
+        <div className="d-flex gap-2 mt-3">
+          <button className="btn btn-success">Pagar</button>
+          <button className="btn btn-outline-danger" onClick={clearCart}>
+            Vaciar carrito
+          </button>
+        </div>
+      )}
     </div>
   );
 };

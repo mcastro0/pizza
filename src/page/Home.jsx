@@ -1,23 +1,13 @@
-import React, { useEffect, useState } from 'react'
-import Header from '../components/Header'
-import CardPizza from '../components/CardPizza'
+import React from 'react';
+import Header from '../components/Header';
+import CardPizza from '../components/CardPizza';
+import { usePizzas } from '../context/PizzaContext';
 
-const Home = ({ agregarPizzaAlCarrito }) => {
-  const [pizzas, setPizzas] = useState([])
+const Home = () => {
+  const { pizzas, loading, error } = usePizzas();
 
-  useEffect(() => {
-    const fetchPizzas = async () => {
-      try {
-        const res = await fetch('http://localhost:5000/api/pizzas')
-        const data = await res.json()
-        setPizzas(data)
-      } catch (error) {
-        console.error('Error al obtener las pizzas:', error)
-      }
-    }
-
-    fetchPizzas()
-  }, [])
+  if (loading) return <p className="text-center mt-4">Cargando pizzas...</p>;
+  if (error) return <p className="text-center mt-4 text-danger">Error: {error}</p>;
 
   return (
     <>
@@ -26,17 +16,19 @@ const Home = ({ agregarPizzaAlCarrito }) => {
         {pizzas.map((pizza) => (
           <CardPizza
             key={pizza.id}
+            id={pizza.id}
             name={pizza.name}
             price={pizza.price}
             ingredients={pizza.ingredients}
             img={pizza.img}
-            onAgregar={() => agregarPizzaAlCarrito(pizza.id)}
           />
         ))}
       </div>
     </>
-  )
-}
+  );
+};
 
-export default Home
+export default Home;
+
+
 

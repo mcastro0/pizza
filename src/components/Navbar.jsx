@@ -1,16 +1,15 @@
-import 'bootstrap/dist/css/bootstrap.min.css'
-import React from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import 'bootstrap/dist/css/bootstrap.min.css';
+import React from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useCart } from '../context/CartContext'; // Importar el contexto
 
-const Navbar = ({ cart, token }) => {
-  const navigate = useNavigate()
-
-  // Suma total del carrito, o 0 si no hay
-  const total = cart.reduce((acc, item) => acc + item.price * item.cantidad, 0)
+const Navbar = ({ token }) => {
+  const navigate = useNavigate();
+  const { total } = useCart(); // Obtener total directamente desde contexto
 
   const formatearTotal = (valor) => {
-    return valor.toLocaleString('es-CL') // Ej: 25.000
-  }
+    return valor.toLocaleString('es-CL'); // Ej: 25.000
+  };
 
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-dark px-4">
@@ -46,8 +45,9 @@ const Navbar = ({ cart, token }) => {
         </div>
       </div>
     </nav>
-  )
-}
+  );
+};
 
-export default Navbar
+export default Navbar;
+
 
