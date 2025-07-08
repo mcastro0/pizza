@@ -1,8 +1,10 @@
 import React from 'react';
-import { useCart } from '../context/CartContext'; // ✅ Importar contexto
+import { useCart } from '../context/CartContext';
+import { useUser } from '../context/UserContext'; // Importa UserContext
 
 const Cart = () => {
-  const { cart, addToCart, removeFromCart, clearCart } = useCart(); // ✅ Obtener funciones del contexto
+  const { cart, addToCart, removeFromCart, clearCart } = useCart();
+  const { token } = useUser(); // Obtener token
 
   const calcularTotal = () => {
     return cart.reduce((acc, pizza) => acc + pizza.price * pizza.quantity, 0);
@@ -17,7 +19,10 @@ const Cart = () => {
       ) : (
         <ul className="list-group mb-3">
           {cart.map(pizza => (
-            <li key={pizza.id} className="list-group-item d-flex justify-content-between align-items-center">
+            <li
+              key={pizza.id}
+              className="list-group-item d-flex justify-content-between align-items-center"
+            >
               <div className="d-flex align-items-center gap-3">
                 <img
                   src={pizza.img}
@@ -56,14 +61,21 @@ const Cart = () => {
 
       {cart.length > 0 && (
         <div className="d-flex gap-2 mt-3">
-          <button className="btn btn-success">Pagar</button>
+          <button className="btn btn-success" disabled={!token}>
+            Pagar
+          </button>
           <button className="btn btn-outline-danger" onClick={clearCart}>
             Vaciar carrito
           </button>
         </div>
+      )}
+
+      {!token && cart.length > 0 && (
+        <p className="text-danger mt-2">Debes iniciar sesión para poder pagar.</p>
       )}
     </div>
   );
 };
 
 export default Cart;
+

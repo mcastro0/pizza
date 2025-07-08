@@ -1,36 +1,38 @@
-import React, { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { useCart } from '../context/CartContext';  // Importa el contexto
 
-const Pizza = ({ agregarPizzaAlCarrito }) => {
-  const { id } = useParams() // obtiene el id de la URL
-  const [pizza, setPizza] = useState(null)
-  const [loading, setLoading] = useState(true)
+const Pizza = () => {
+  const { id } = useParams(); // obtiene el id de la URL
+  const { addToCart } = useCart(); // obtener función para agregar al carrito desde contexto
+  const [pizza, setPizza] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchPizza = async () => {
       try {
-        setLoading(true)
-        const res = await fetch(`http://localhost:5000/api/pizzas/${id}`)
-        if (!res.ok) throw new Error('Pizza no encontrada')
-        const data = await res.json()
-        setPizza(data)
+        setLoading(true);
+        const res = await fetch(`http://localhost:5000/api/pizzas/${id}`);
+        if (!res.ok) throw new Error('Pizza no encontrada');
+        const data = await res.json();
+        setPizza(data);
       } catch (error) {
-        console.error('Error al obtener la pizza:', error)
-        setPizza(null)
+        console.error('Error al obtener la pizza:', error);
+        setPizza(null);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    fetchPizza()
-  }, [id])
+    fetchPizza();
+  }, [id]);
 
   if (loading) {
-    return <p className="text-center mt-5">Cargando pizza...</p>
+    return <p className="text-center mt-5">Cargando pizza...</p>;
   }
 
   if (!pizza) {
-    return <p className="text-center mt-5 text-danger">Pizza no encontrada.</p>
+    return <p className="text-center mt-5 text-danger">Pizza no encontrada.</p>;
   }
 
   return (
@@ -52,16 +54,16 @@ const Pizza = ({ agregarPizzaAlCarrito }) => {
         ))}
       </ul>
       <p className="mt-3">
-        <strong>Precio:</strong> ${pizza.price}
+        <strong>Precio:</strong> ${pizza.price.toLocaleString('es-CL')}
       </p>
       <button
         className="btn btn-success mt-3"
-        onClick={() => agregarPizzaAlCarrito(pizza.id)}
+        onClick={() => addToCart(pizza)}
       >
         Añadir al carrito
       </button>
     </div>
-  )
-}
+  );
+};
 
-export default Pizza
+export default Pizza;
