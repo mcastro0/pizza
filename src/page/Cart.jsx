@@ -1,14 +1,56 @@
-import React from 'react';
-import { useCart } from '../context/CartContext';
-import { useUser } from '../context/UserContext'; // Importa UserContext
+import React, { useState } from 'react'
+import { useCart } from '../context/CartContext'
+import { useUser } from '../context/UserContext'
+import axios from 'axios'
 
 const Cart = () => {
-  const { cart, addToCart, removeFromCart, clearCart } = useCart();
-  const { token } = useUser(); // Obtener token
+  const { cart, addToCart, removeFromCart, clearCart } = useCart()
+  const { token } = useUser()
+
+  const [loading, setLoading] = useState(false)
+  const [message, setMessage] = useState(null)
+  const [error, setError] = useState(null)
 
   const calcularTotal = () => {
-    return cart.reduce((acc, pizza) => acc + pizza.price * pizza.quantity, 0);
-  };
+    return cart.reduce((acc, pizza) => acc + pizza.price * pizza.quantity, 0)
+  }
+
+  const handleCheckout = async () => {
+    if (!token) {
+      setError('Debes iniciar sesión para poder pagar.')
+      return
+    }
+
+    if (cart.length === 0) {
+      setError('El carrito está vacío.')
+      return
+    }
+
+    setLoading(true)
+    setError(null)
+    setMessage(null)
+
+    try {
+      const response = await axios.post(
+        '/api/checkouts',
+        { items: cart },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      )
+
+      setMessage('Compra realizada con éxito!')
+      clearCart()
+      setTimeout(() => setMessage(null), 5000)
+    } catch (err) {
+      setError(err.response?.data?.message || 'Error al procesar la compra')
+    } finally {
+      setLoading(false)
+    }
+  }
 
   return (
     <div className="container mt-4">
@@ -61,10 +103,14 @@ const Cart = () => {
 
       {cart.length > 0 && (
         <div className="d-flex gap-2 mt-3">
-          <button className="btn btn-success" disabled={!token}>
-            Pagar
+          <button
+            className="btn btn-success"
+            disabled={!token || loading}
+            onClick={handleCheckout}
+          >
+            {loading ? 'Procesando...' : 'Pagar'}
           </button>
-          <button className="btn btn-outline-danger" onClick={clearCart}>
+          <button className="btn btn-outline-danger" onClick={clearCart} disabled={loading}>
             Vaciar carrito
           </button>
         </div>
@@ -73,9 +119,12 @@ const Cart = () => {
       {!token && cart.length > 0 && (
         <p className="text-danger mt-2">Debes iniciar sesión para poder pagar.</p>
       )}
-    </div>
-  );
-};
 
-export default Cart;
+      {message && <div className="alert alert-success mt-3">{message}</div>}
+      {error && <div className="alert alert-danger mt-3">{error}</div>}
+    </div>
+  )
+}
+
+export default Cart
 

@@ -1,17 +1,18 @@
-import React, { useState } from 'react'
+import React from 'react'
+import { useUser } from '../context/UserContext'
+import { useNavigate } from 'react-router-dom'
 
 const Profile = () => {
-  // Simulamos un usuario logueado con email
-  const [email, setEmail] = useState('usuario@example.com')
+  const { email, logout, token } = useUser()
+  const navigate = useNavigate()
 
-  // Función para cerrar sesión (aquí solo limpia el email)
   const handleLogout = () => {
-    // Aquí puedes añadir lógica real de logout
-    setEmail(null)
+    logout()
     alert('Has cerrado sesión')
+    navigate('/login')
   }
 
-  if (!email) {
+  if (!token) {
     return (
       <div style={{ textAlign: 'center', marginTop: '50px' }}>
         <h2>No estás logueado.</h2>
@@ -23,8 +24,8 @@ const Profile = () => {
     <div style={{ maxWidth: '400px', margin: '50px auto', textAlign: 'center' }}>
       <h1>Perfil de usuario</h1>
       <p>Email: <strong>{email}</strong></p>
-      <button 
-        onClick={handleLogout} 
+      <button
+        onClick={handleLogout}
         style={{
           padding: '10px 20px',
           backgroundColor: '#d9534f',

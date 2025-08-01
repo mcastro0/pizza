@@ -1,31 +1,46 @@
-import React, { useState } from "react";
+import React, { useState } from "react"
+import { useNavigate } from "react-router-dom"
+import { useUser } from "../context/UserContext"
 
 const LoginPage = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [message, setMessage] = useState(null);
-  const [isError, setIsError] = useState(false);
+  const navigate = useNavigate()
+  const { login } = useUser()
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [message, setMessage] = useState(null)
+  const [isError, setIsError] = useState(false)
 
-    // Validaciones
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+
+ 
     if (!email || !password) {
-      setIsError(true);
-      setMessage("Todos los campos son obligatorios");
-      return;
+      setIsError(true)
+      setMessage("Todos los campos son obligatorios")
+      return
     }
 
     if (password.length < 6) {
-      setIsError(true);
-      setMessage("La contraseña debe tener al menos 6 caracteres");
-      return;
+      setIsError(true)
+      setMessage("La contraseña debe tener al menos 6 caracteres")
+      return
     }
 
-    // Simulamos login exitoso
-    setIsError(false);
-    setMessage("¡Ingreso exitoso!");
-  };
+
+    const result = await login({ email, password })
+
+    if (result.success) {
+      setIsError(false)
+      setMessage("¡Ingreso exitoso!")
+      setTimeout(() => {
+        navigate("/")
+      }, 1000)
+    } else {
+      setIsError(true)
+      setMessage(result.message || "Error al iniciar sesión")
+    }
+  }
 
   return (
     <div className="container mt-4" style={{ maxWidth: "400px" }}>
@@ -42,6 +57,7 @@ const LoginPage = () => {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="Ingrese su email"
+            required
           />
         </div>
         <div className="mb-3">
@@ -55,6 +71,7 @@ const LoginPage = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Ingrese su contraseña"
+            required
           />
         </div>
         <button type="submit" className="btn btn-primary">
@@ -73,7 +90,7 @@ const LoginPage = () => {
         </div>
       )}
     </div>
-  );
-};
+  )
+}
 
-export default LoginPage;
+export default LoginPage
